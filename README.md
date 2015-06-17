@@ -1,10 +1,16 @@
-#Slack Exception Logger Bundle for Symfony2#
+#Slack Exception Logger Bundle for Symfony2
 
 This bundle allows exceptions thrown in a symfony2 app to be logged automatically to a [Slack](https://slack.com) channel.
 
 ![Alt text](Resources/documentation/exception.png)
 
 To use, you first need to set up an incoming webhook in Slack - you can do this at https://your_slack_instance.slack.com/services/new/incoming-webhook (replace _your_slack_instance_ with whatever you particular Slack instance is called). Once you've done that, you'll be given a web hook URL - make a note of that, you'll need to add that to your `config.yml` file.
+
+Install this bundle into your symfony app:
+
+```
+$ composer require dopiaza/slack-exception-logger-bundle
+```
 
 Next, add the bundle to `registerBundles` in `AppKernel.php`:
 
