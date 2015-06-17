@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Log symfony exceptionst to Slack
+ *
+ */
 namespace Dopiaza\Slack\ExceptionLoggerBundle\Service;
 
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
@@ -25,12 +29,21 @@ class ExceptionHandler
     /** @var array */
     private $environmentConfigurations;
 
+    /**
+     * @param LoggerInterface $logger
+     * @param $environment
+     */
     public function __construct(LoggerInterface $logger, $environment)
     {
         $this->logger = $logger;
         $this->environment = $environment;
     }
 
+    /**
+     * Handle the exception
+     *
+     * @param GetResponseForExceptionEvent $event
+     */
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
@@ -43,6 +56,11 @@ class ExceptionHandler
         return;
     }
 
+    /**
+     * Post exception details to Slack
+     *
+     * @param \Exception $exception
+     */
     protected function postToSlack(\Exception $exception)
     {
         $url = $this->getWebhook();
@@ -53,6 +71,12 @@ class ExceptionHandler
         }
     }
 
+    /**
+     * Format the JSON message to post to Slack
+     *
+     * @param \Exception $exception
+     * @return null|string
+     */
     protected function formatSlackMessageForException(\Exception $exception)
     {
         $config = $this->getConfigForEnvironment();
@@ -124,6 +148,13 @@ class ExceptionHandler
         return $json;
     }
 
+    /**
+     * Do an HTTP post
+     *
+     * @param $url
+     * @param null $body
+     * @return bool
+     */
     protected function post($url, $body = null)
     {
         if (empty($body))
@@ -168,6 +199,12 @@ class ExceptionHandler
         return true;
     }
 
+    /**
+     * Check to see if this exception is in an exclude list
+     *
+     * @param $exception
+     * @return bool
+     */
     private function shouldProcessException($exception)
     {
         $shouldProcess = true;
@@ -193,6 +230,11 @@ class ExceptionHandler
         return $shouldProcess;
     }
 
+    /**
+     * Get the configuration for the current environment
+     *
+     * @return mixed
+     */
     private function getConfigForEnvironment()
     {
         return $this->environmentConfigurations[$this->environment];
