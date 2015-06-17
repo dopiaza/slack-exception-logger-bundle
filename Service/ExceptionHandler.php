@@ -1,0 +1,272 @@
+<?php
+
+namespace Dopiaza\Slack\ExceptionLoggerBundle\Service;
+
+use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\HttpKernel\Log\LoggerInterface;
+
+class ExceptionHandler
+{
+    /** @var  LoggerInterface  */
+    private $logger;
+
+    /** @var string */
+    private $environment;
+
+    /** @var string */
+    private $webhook;
+
+    /** @var string */
+    private $name;
+
+    /** @var string */
+    private $botname;
+
+    /** @var array */
+    private $environmentConfigurations;
+
+    public function __construct(LoggerInterface $logger, $environment)
+    {
+        $this->logger = $logger;
+        $this->environment = $environment;
+    }
+
+    public function onKernelException(GetResponseForExceptionEvent $event)
+    {
+        $exception = $event->getException();
+
+        if ($this->shouldProcessException($exception))
+        {
+            $this->postToSlack($exception);
+        }
+
+        return;
+    }
+
+    protected function postToSlack(\Exception $exception)
+    {
+        $url = $this->getWebhook();
+        $message = $this->formatSlackMessageForException($exception);
+        if (!empty($message))
+        {
+            $this->post($url, $message);
+        }
+    }
+
+    protected function formatSlackMessageForException(\Exception $exception)
+    {
+        $config = $this->getConfigForEnvironment();
+        $json = null;
+
+        if (!empty($config))
+        {
+            $code = $exception->getCode();
+            $text = $exception->getMessage();
+            $file = $exception->getFile();
+            $line = $exception->getLine();
+            $fullClassName = get_class($exception);
+            $className = preg_replace('/^.*\\\\([^\\\\]+)$/', '$1', $fullClassName);
+            $now = new \DateTime();
+
+            $message = array(
+                'channel' => '#' . $config['channel'],
+                'username' => $this->getBotname(),
+                'text' => $className . ' thrown in ' . $this->getName(),
+                'attachments' => array(
+                    array(
+                        'fallback'=> $text,
+                        'color' => 'danger',
+                        'pretext' => '',
+                        'title' => $fullClassName,
+                        'fields' => array(
+                            array(
+                                'title' => 'Message',
+                                'value' => $text,
+                            ),
+                            array(
+                                'title' => 'System',
+                                'value' => $this->getName(),
+                                'short' => 1,
+                            ),
+                            array(
+                                'title' => 'Timestamp',
+                                'value' => $now->format(DATE_ISO8601),
+                                'short' => 1,
+                            ),
+                            array(
+                                'title' => 'Code',
+                                'value' => $code,
+                                'short' => 1,
+                            ),
+                            array(
+                                'title' => 'Environment',
+                                'value' => $this->environment,
+                                'short' => 1,
+                            ),
+                            array(
+                                'title' => 'File',
+                                'value' => $file,
+                                'short' => 1,
+                            ),
+                            array(
+                                'title' => 'Line',
+                                'value' => $line,
+                                'short' => 1,
+                            ),
+                        ),
+                    ),
+                ),
+            );
+
+            $json = json_encode($message);
+        }
+
+        return $json;
+    }
+
+    protected function post($url, $body = null)
+    {
+        if (empty($body))
+        {
+            return false;
+        }
+
+        $ch = curl_init();
+
+        if (!$ch)
+        {
+            $this->log('Failed to create curl handle');
+            return false;
+        }
+
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                    'Content-Type: application/json',
+                    'Content-Length: ' . strlen($body))
+        );
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+
+        $response = curl_exec($ch);
+        $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+        curl_close($ch);
+
+        if ($httpStatusCode != 200)
+        {
+            $this->log('Failed to post to slack: status ' . $httpStatusCode);
+            return false;
+        }
+        if ($response != 'ok')
+        {
+            $this->log('Didn\'t get an "ok" back from slack, got: ' . $response);
+            return false;
+        }
+
+        return true;
+    }
+
+    private function shouldProcessException($exception)
+    {
+        $shouldProcess = true;
+
+        $config = $this->getConfigForEnvironment();
+        if (!empty($config))
+        {
+            if (array_key_exists('exclude_exception', $config))
+            {
+                $className = get_class($exception);
+                $excludeList = $config['exclude_exception'];
+                foreach ($excludeList as $exclude)
+                {
+                    if ($exclude == $className)
+                    {
+                        $shouldProcess = false;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $shouldProcess;
+    }
+
+    private function getConfigForEnvironment()
+    {
+        return $this->environmentConfigurations[$this->environment];
+    }
+
+    protected function log($message)
+    {
+        if (!empty($this->logger))
+        {
+            $this->logger->info($message);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getWebhook()
+    {
+        return $this->webhook;
+    }
+
+    /**
+     * @param string $webhook
+     */
+    public function setWebhook($webhook)
+    {
+        $this->webhook = $webhook;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBotname()
+    {
+        return $this->botname;
+    }
+
+    /**
+     * @param string $botname
+     */
+    public function setBotname($botname)
+    {
+        $this->botname = $botname;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEnvironmentConfigurations()
+    {
+        return $this->environmentConfigurations;
+    }
+
+    /**
+     * @param array $environmentConfigurations
+     */
+    public function setEnvironmentConfigurations($environmentConfigurations)
+    {
+        $this->environmentConfigurations = $environmentConfigurations;
+    }
+}

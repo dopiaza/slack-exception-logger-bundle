@@ -1,0 +1,32 @@
+{
+  "name" : "dopiaza/slack-exception-logger-bundle",
+  "description" : "Log symfony2 exceptions to a Slack channel",
+  "type" : "symfony-bundle",
+  "authors" : [{
+    "name" : "David Wilkinson",
+    "email" : "dopiaza@dopiaza.org"
+  }],
+  "keywords" : [
+    "exception", "slack"
+  ],
+  "license" : [
+    "MIT"
+  ],
+  "require" : {
+      "php": ">=5.3.2",
+      "symfony/framework-bundle": "2.*"
+  },
+  "autoload" : {
+    "psr-0" : {
+      "Dopiaza\\Slack\\ExceptionLoggerBundle" : ""
+    }
+  },
+  "target-dir" : "Dopiaza/Slack/ExceptionLoggerBundle",
+  "repositories" : [{
+  }],
+  "extra" : {
+    "branch-alias" : {
+      "dev-master" : "1.0.x-dev"
+    }
+  }
+}
