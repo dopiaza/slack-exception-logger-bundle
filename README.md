@@ -4,7 +4,7 @@ This bundle allows exceptions thrown in a symfony2 app to be logged automaticall
 
 ![Alt text](Resources/documentation/exception.png)
 
-To use, you first need to set up an incoming webhook in Slack - you can do this at https://your_slack_instance.slack.com/services/new/incoming-webhook (replace _your_slack_instance_ with whatever you particular Slack instance is called). Once you've done that, you'll be given a web hook URL - make a note of that, you'll need to add that to your `config.yml` file.
+To use, you first need to set up an incoming webhook in Slack - you can do this at https://your_slack_instance.slack.com/services/new/incoming-webhook (replace _your_slack_instance_ with whatever your particular Slack instance is called). Once you've done that, you'll be given a web hook URL - make a note of that, you'll need to add that to your `config.yml` file.
 
 Install this bundle into your symfony app:
 
