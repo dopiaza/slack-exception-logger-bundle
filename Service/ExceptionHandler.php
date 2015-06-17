@@ -82,7 +82,7 @@ class ExceptionHandler
         $config = $this->getConfigForEnvironment();
         $json = null;
 
-        if (!empty($config))
+        if (!empty($config) && $config['enabled'])
         {
             $code = $exception->getCode();
             $text = $exception->getMessage();
