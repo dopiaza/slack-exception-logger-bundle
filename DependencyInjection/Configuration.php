@@ -34,7 +34,6 @@ class Configuration implements ConfigurationInterface
             ->end()
 
             ->scalarNode('botname')
-                ->defaultValue('symfony-bot')
             ->end()
 
             ->arrayNode('environments')
