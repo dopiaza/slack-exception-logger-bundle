@@ -94,12 +94,11 @@ class ExceptionHandler
 
             $message = array(
                 'channel' => '#' . $config['channel'],
-                'username' => $this->getBotname(),
                 'text' => $className . ' thrown in ' . $this->getName(),
                 'attachments' => array(
                     array(
                         'fallback'=> $text,
-                        'color' => 'danger',
+                        'color' => $config['color'],
                         'pretext' => '',
                         'title' => $fullClassName,
                         'fields' => array(
@@ -141,6 +140,11 @@ class ExceptionHandler
                     ),
                 ),
             );
+
+            if (!empty($this->botname))
+            {
+                $message['username'] = $this->botname;
+            }
 
             $json = json_encode($message);
         }
