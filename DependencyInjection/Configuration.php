@@ -41,6 +41,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->children()
                             ->booleanNode('enabled')->defaultTrue()->end()
+                            ->scalarNode('color')->defaultValue('danger')->end()
                             ->scalarNode('channel')->isRequired()->end()
                             ->arrayNode('exclude_exception')->prototype('scalar')->end()
                         ->end()

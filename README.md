@@ -29,6 +29,7 @@ dopiaza_slack_exception_logger:
     environments:
         test:
             enabled: true
+            color: '#992255'
             channel: symfony-exceptions
         prod:
             channel: symfony-exceptions
@@ -43,9 +44,11 @@ dopiaza_slack_exception_logger:
 
 `name` is the name of your symfony application. This is useful if you have multiple apps all posting to the same channel.
 
-`environments` holds all environment specific configuration settings. Usual values to include in here would be `dev`, `test` and `prod`. If the environment being used isn't listed in this section, no exceptions will be posted. You probably don't really want to list `dev` in here, as that one is likely to generate quite a bit of noise, but hey, it's your choice.
+`environments` holds all environment-specific configuration settings. Usual environment values to include in here would be `dev`, `test` and `prod`. If the environment being used isn't listed in this section, no exceptions will be posted. You probably don't really want to list `dev` in here, as that one is likely to generate quite a bit of noise, but hey, it's your choice.
 
 `enabled` is an optional boolean to allow logging to be enabled or disabled on a per-channel basis. If not specified, it defaults to true.
+
+`color` is an optional field used to determine the colour of the sidebar for the message. Valid values are `good` (green), `warning` (yellow), `danger` (red), or any hex value (e.g. `'#abcdef'`). Note that if you use a hex value, be sure to put it in quotes, otherwise the `#` will be interpreted as the start of a comment and the sidebar will come out an unattractive grey colour. If not specified, the default value is `danger`.
 
 `channel` is the name of the channel to which exceptions are posted. 
 

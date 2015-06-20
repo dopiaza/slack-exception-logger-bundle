@@ -98,7 +98,7 @@ class ExceptionHandler
                 'attachments' => array(
                     array(
                         'fallback'=> $text,
-                        'color' => 'danger',
+                        'color' => $config['color'],
                         'pretext' => '',
                         'title' => $fullClassName,
                         'fields' => array(
