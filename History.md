@@ -4,7 +4,7 @@
 
 20th June 2015
 
-`botname` is now an option parameter. It has no default value. If no value is specified, Slack will use the name specified in your incoming web hook integration.
+`botname` is now an optional parameter. It has no default value. If no value is specified, Slack will use the name specified in your incoming web hook integration.
 
 Added `color` configuration parameter to allow sidebar colour to be set.
 
