@@ -40,7 +40,7 @@ dopiaza_slack_exception_logger:
 
 `webhook` is the URL of the incoming web hook for your Slack instance.
 
-`botname` is the name of the user that message will be posted as in your Slack channel. This defaults to `symfony-bot`.
+`botname` is the name of the user that message will be posted as in your Slack channel. It has no default value. If no value is specified, Slack will use the name specified in your incoming web hook integration.
 
 `name` is the name of your symfony application. This is useful if you have multiple apps all posting to the same channel.
 
