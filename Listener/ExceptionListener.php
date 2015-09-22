@@ -7,11 +7,11 @@ use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
 
 class ExceptionListener
 {
-    /** @var string */
-    private $environment;
+    /** @var Notifier */
+    private $notifier;
 
     /** @var string */
-    private $notifier;
+    private $environment;
 
     /** @var array */
     private $environmentConfigurations;
