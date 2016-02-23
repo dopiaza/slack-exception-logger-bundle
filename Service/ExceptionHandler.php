@@ -7,7 +7,7 @@
 namespace Dopiaza\Slack\ExceptionLoggerBundle\Service;
 
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 class ExceptionHandler
 {
