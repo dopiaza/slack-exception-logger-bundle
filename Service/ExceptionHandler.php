@@ -7,7 +7,7 @@
 namespace Dopiaza\Slack\ExceptionLoggerBundle\Service;
 
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
-use Symfony\Component\HttpKernel\Log\LoggerInterface;
+use Psr\Log\LoggerInterface;
 
 class ExceptionHandler
 {
@@ -241,7 +241,7 @@ class ExceptionHandler
      */
     private function getConfigForEnvironment()
     {
-        return $this->environmentConfigurations[$this->environment];
+        return isset($this->environmentConfigurations[$this->environment]) ? $this->environmentConfigurations[$this->environment] : null;
     }
 
     protected function log($message)
