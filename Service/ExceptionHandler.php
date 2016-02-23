@@ -241,7 +241,7 @@ class ExceptionHandler
      */
     private function getConfigForEnvironment()
     {
-        return $this->environmentConfigurations[$this->environment];
+        return isset($this->environmentConfigurations[$this->environment]) ? $this->environmentConfigurations[$this->environment] : null;
     }
 
     protected function log($message)
