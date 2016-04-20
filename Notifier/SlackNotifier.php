@@ -30,6 +30,9 @@ class SlackNotifier implements Notifier
     /** @var string */
     private $botname;
 
+    /** @var  string */
+    private $environment;
+
     /** @var array */
     private $environmentConfigurations;
 
@@ -44,10 +47,11 @@ class SlackNotifier implements Notifier
 
     /**
      * @param \Exception $exception
+     * @param null $routeInfo
      */
-    public function notify(\Exception $exception)
+    public function notify(\Exception $exception, $routeInfo = null)
     {
-        $message = $this->formatSlackMessageForException($exception);
+        $message = $this->formatSlackMessageForException($exception, $routeInfo);
         if (!empty($message)) {
             $this->httpClient->post($this->webhook, $message);
         }
@@ -89,15 +93,12 @@ class SlackNotifier implements Notifier
      * Format the JSON message to post to Slack
      *
      * @param \Exception $exception
+     * @param null $routeInfo
      * @return null|string
      */
-    protected function formatSlackMessageForException(\Exception $exception)
+    protected function formatSlackMessageForException(\Exception $exception, $routeInfo = null)
     {
         $config = isset($this->environmentConfigurations[$this->environment]) ? $this->environmentConfigurations[$this->environment] : null;
-
-        if (empty($config) OR (isset($config['enabled']) && $config['enabled'] === false)) {
-            return;
-        }
 
         $code = $exception->getCode();
         $text = $exception->getMessage();
@@ -156,12 +157,22 @@ class SlackNotifier implements Notifier
             ),
         );
 
+        if (is_array($routeInfo)) {
+            foreach ($routeInfo as $key => $value) {
+                $message['attachments'][0]['fields'][] = array(
+                    'title' => ucfirst(ltrim($key, '_')),
+                    'value' => is_array($value) ? json_encode($value) : $value,
+                    'short' => 1
+                );
+
+            }
+        }
+
         if (!empty($this->botname)) {
             $message['username'] = $this->botname;
         }
 
         $json = json_encode($message);
-
 
         return $json;
     }

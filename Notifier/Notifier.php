@@ -6,6 +6,8 @@ interface Notifier
 {
     /**
      * @param \Exception $exception
+     * @param null $routeInfo
+     * @return
      */
-    public function notify(\Exception $exception);
+    public function notify(\Exception $exception, $routeInfo = null);
 }

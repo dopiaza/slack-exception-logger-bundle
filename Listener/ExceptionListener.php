@@ -42,9 +42,17 @@ class ExceptionListener
     public function onKernelException(GetResponseForExceptionEvent $event)
     {
         $exception = $event->getException();
+        $routeInfo = null;
+
+        // not everything has routing info so instead of checking for everything we just let it fail
+        try {
+            $routeInfo = $event->getRequest()->attributes->all();
+        } catch (\Exception $e) {
+            // do nothing
+        }
 
         if ($this->shouldProcessException($exception)) {
-            $this->notifier->notify($exception);
+            $this->notifier->notify($exception, $routeInfo);
         }
 
         return;
