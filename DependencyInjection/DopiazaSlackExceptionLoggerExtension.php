@@ -26,13 +26,15 @@ class DopiazaSlackExceptionLoggerExtension extends Extension
         $loader->load('services.yml');
 
         $exceptionHandlerDefinition = $container->getDefinition('dopiaza_slack_exception_logger.listener');
-        $exceptionHandlerDefinition->addMethodCall('setWebhook', array($config['webhook']));
-        $exceptionHandlerDefinition->addMethodCall('setName', array($config['name']));
         $exceptionHandlerDefinition->addMethodCall('setEnvironmentConfigurations', array($config['environments']));
 
+        $notifierDefinition = $container->getDefinition('dopiaza_slack_exception_logger.notifier');
+        $notifierDefinition->addMethodCall('setEnvironmentConfigurations', array($config['environments']));
+        $notifierDefinition->addMethodCall('setWebhook', array($config['webhook']));
+        $notifierDefinition->addMethodCall('setName', array($config['name']));
         if (array_key_exists('botname', $config))
         {
-            $exceptionHandlerDefinition->addMethodCall('setBotname', array($config['botname']));
+            $notifierDefinition->addMethodCall('setBotname', array($config['botname']));
         }
     }
 }
