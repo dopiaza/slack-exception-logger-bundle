@@ -8,6 +8,7 @@ namespace Dopiaza\Slack\ExceptionLoggerBundle\Service;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseForExceptionEvent;
+use Symfony\Component\Console\Event\ConsoleErrorEvent;
 
 class ExceptionHandler
 {
@@ -40,7 +41,7 @@ class ExceptionHandler
     }
 
     /**
-     * Handle the exception
+     * Handle kernel exception
      *
      * @param GetResponseForExceptionEvent $event
      */
@@ -57,11 +58,28 @@ class ExceptionHandler
     }
 
     /**
+     * Handle console error
+     *
+     * @param ConsoleErrorEvent $event
+     */
+    public function onConsoleError(ConsoleErrorEvent $event)
+    {
+        $exception = $event->getError();
+
+        if ($this->shouldProcessException($exception))
+        {
+            $this->postToSlack($exception);
+        }
+
+        return;
+    }
+
+    /**
      * Post exception details to Slack
      *
      * @param \Exception $exception
      */
-    protected function postToSlack(\Exception $exception)
+    protected function postToSlack(\Throwable $exception)
     {
         $url = $this->getWebhook();
         $message = $this->formatSlackMessageForException($exception);
@@ -77,7 +95,7 @@ class ExceptionHandler
      * @param \Exception $exception
      * @return null|string
      */
-    protected function formatSlackMessageForException(\Exception $exception)
+    protected function formatSlackMessageForException(\Throwable  $exception)
     {
         $config = $this->getConfigForEnvironment();
         $json = null;
@@ -209,7 +227,7 @@ class ExceptionHandler
      * @param $exception
      * @return bool
      */
-    private function shouldProcessException($exception)
+    private function shouldProcessException(\Throwable $exception)
     {
         $shouldProcess = true;
 

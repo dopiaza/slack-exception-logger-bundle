@@ -7,3 +7,4 @@ services:
             - "%kernel.environment%"
         tags:
             - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+            - { name: kernel.event_listener, event: console.error, method: onConsoleError }
