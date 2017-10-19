@@ -218,11 +218,10 @@ class ExceptionHandler
         {
             if (array_key_exists('exclude_exception', $config))
             {
-                $className = get_class($exception);
                 $excludeList = $config['exclude_exception'];
                 foreach ($excludeList as $exclude)
                 {
-                    if ($exclude == $className)
+                    if ($exception instanceof $exclude)
                     {
                         $shouldProcess = false;
                         break;
